@@ -280,3 +280,76 @@ sns.lineplot("windspeed", "cnt", data=hour_df_out.compute(), palette="rainbow", 
 
 sns.set()
 sns.lineplot("weathersit", "cnt", data=hour_df.compute(), palette="rainbow", ci=None)
+
+# Feature Engineering
+
+# Calculate the real temperature using the above equation
+
+hour_df_out["temp_real"] = 47 * hour_df_out["temp"] - 8
+
+# Using the results from real temperature in Celcius, I can use these values to calculate the heat index or humiture (HI), 
+# which is an index that combines air temperature and relative humidity. The formula used for calculation is as follows: 
+# HI = c1 + c2T + c3R + c4TR + c5T^2 + c6R^2 + c7RT^2 + c8TR^2 + c9T^2R^2 
+# where T is the temperature (in degrees Celcius) and R is the relative humidity (percentage value between 0 and 100)
+# c1 = −8.78469475556, c2 = 1.61139411, c3 = 2.33854883889, c4 = -0.14611605, 
+# c5 = -0.012308094, c6 = -0.0164248277778, c7 = 0.002211732, c8 = 0.00072546, c9 = -0.000003582
+
+hour_df_out["heat_index"] = (
+    -8.78469475556
+    + (1.61139411 * (hour_df_out["temp_real"]))
+    + (2.33854883889 * hour_df_out["humidity"] * 100)
+    + (-0.14611605 * hour_df_out["temp_real"] * hour_df_out["humidity"] * 100)
+    + (-0.012308094 * (hour_df_out["temp_real"]) ** 2)
+    + (-0.0164248277778 * (hour_df_out["humidity"] * 100) ** 2)
+    + (
+        0.002211732
+        * ((hour_df_out["temp_real"]) ** 2)
+        * (hour_df_out["humidity"] * 100)
+    )
+    + (0.00072546 * hour_df_out["temp_real"] * (hour_df_out["humidity"] * 100) ** 2)
+    + (
+        -0.000003582
+        * ((hour_df_out["humidity"] * 100) * 2)
+        * ((hour_df_out["temp_real"]) * 2)
+    )
+)
+
+# Wind Chill Index (WCI)
+
+# I can also calculate the Wind Chill Index (WCI) which is the lowering of body temperature due to the passing-flow of 
+# lower-temperature air. The formula used is as follows: 
+# WCI = (10SQRT(windspeed) - windspeed + 10.5)(33 - temp_real)
+# where:
+# WCI = wind chill index, kcal/m2/h v = wind velocity, m/s Ta = air temperature, °C
+# since the wind speed is in km/h we will use a 0.277778 coefficient to convert it to m/s
+
+hour_df_out["WCI"] = (
+    10 * np.sqrt(hour_df_out["windspeed"] * 0.277778 * 100)
+    - (0.277778 * hour_df_out["windspeed"])
+    + 10.5
+) * (33 - hour_df_out["temp_real"])
+
+# Humidity Index (HX)
+
+# The humidex (“humidity Index”, abbreviated to HX in the present study) is a measure of the combined effect of heat and 
+# humidity on human physiology. It is calculated from air temperature and relative humidity. 
+# First, the vapour pressure of water v (in hPa) is calculated using:
+# v = (6.112 × 10ˆ(7.5*T/(237.7 + T)) * RH/100)
+# where T = air temperature (°C) and RH is the relative humidity (%).
+# The Humidex (HX) is then found using: HX = T + (v − 10) * 5 / 9
+
+hour_df_out["v"] = (
+    6.112 * 10 ** (7.5 * hour_df_out["temp_real"] / (237.7 + hour_df_out["temp_real"]))
+) * (hour_df_out["humidity"])
+
+hour_df_out["humidex"] = hour_df_out["temp_real"] + ((hour_df_out["v"] - 10) * (5 / 9))
+
+# check correlations again
+
+# Based on this we identified multicollinearity between season and month and decided to drop month as season 
+# has a higher correlation with the target variable cnt
+
+plt.figure(figsize=(20, 5))
+mask = np.zeros_like(hour_df_out.corr(), dtype=np.bool)
+mask[np.triu_indices_from(mask)] = True
+sns.heatmap(hour_df_out.corr(), cmap="RdBu_r", annot=True)
