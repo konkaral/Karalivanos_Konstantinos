@@ -102,3 +102,86 @@ hour_df_out = hour_df[
     )
 ]
 hour_df_out.shape
+
+# Next have a look if there is a seasonal component in our dataset. 
+# As a fact, usage peeks during summer and fall, which makes sense. (for casual users)
+
+sns.set()
+plt.figure(figsize=(11, 5))
+sns.barplot(
+    "year", "casual", hue="season", data=hour_df.compute(), palette="rainbow", ci=None
+)
+plt.legend(loc="upper right", bbox_to_anchor=(1.2, 0.5))
+plt.xlabel("Year")
+plt.ylabel("Total number of bikes rented on Casual basis")
+plt.title("Number of bikes rented per season")
+
+sns.set()
+plt.figure(figsize=(11, 5))
+sns.barplot(
+    "year",
+    "registered",
+    hue="season",
+    data=hour_df.compute(),
+    palette="rainbow",
+    ci=None,
+)
+plt.legend(loc="upper right", bbox_to_anchor=(1.2, 0.5))
+plt.xlabel("Year")
+plt.ylabel("Total number of bikes rented on Registered basis")
+plt.title("Number of bikes rented per season")
+
+# Seasonal distribution of rentals (sum)
+
+f, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(13, 6))
+
+ax1 = (
+    hour_df_out[["season", "cnt"]]
+    .compute()
+    .groupby(["season"])
+    .sum()
+    .reset_index()
+    .plot(
+        kind="bar",
+        legend=False,
+        title="Counts of Bike Rentals by season",
+        stacked=True,
+        fontsize=12,
+        ax=ax1,
+    )
+)
+ax1.set_xlabel("season", fontsize=12)
+ax1.set_ylabel("Count", fontsize=12)
+ax1.set_xticklabels(["Spring", "Summer", "Fall", "Winter"])
+
+ax2 = (
+    hour_df_out[["weathersit", "cnt"]]
+    .compute()
+    .groupby(["weathersit"])
+    .sum()
+    .reset_index()
+    .plot(
+        kind="bar",
+        legend=False,
+        stacked=True,
+        title="Counts of Bike Rentals by weathersit",
+        fontsize=12,
+        ax=ax2,
+    )
+)
+
+ax2.set_xlabel("weathersit", fontsize=12)
+ax2.set_ylabel("Count", fontsize=12)
+ax2.set_xticklabels(["1: Clear", "2: Mist", "3: Light Snow", "4: Heavy Rain"])
+
+f.tight_layout()
+
+# Splitting for whether the day is a workday or not gives us useful insights.
+
+sns.barplot(x="month", y="cnt", hue="is_workingday", data=hour_df_out.compute())
+plt.show()
+
+# Additionally check how the year influences the average and see that the average usage in year 2012 was always higher.
+
+sns.barplot(x="month", y="cnt", hue="year", data=hour_df_out.compute())
+plt.show()
