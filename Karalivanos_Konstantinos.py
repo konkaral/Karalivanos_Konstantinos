@@ -185,3 +185,75 @@ plt.show()
 
 sns.barplot(x="month", y="cnt", hue="year", data=hour_df_out.compute())
 plt.show()
+
+# Hourly distribution of rentals over month (average)
+
+# Configuring plotting visual and sizes
+sns.set_style("whitegrid")
+sns.set_context("talk")
+params = {
+    "legend.fontsize": "x-large",
+    "figure.figsize": (30, 10),
+    "axes.labelsize": "x-large",
+    "axes.titlesize": "x-large",
+    "xtick.labelsize": "x-large",
+    "ytick.labelsize": "x-large",
+}
+
+plt.rcParams.update(params)
+
+fig, ax = plt.subplots()
+sns.pointplot(
+    data=hour_df_out[["hour", "cnt", "season"]].compute(),
+    x="hour",
+    y="cnt",
+    hue="season",
+    ax=ax,
+)
+ax.set(title="Season wise hourly distribution of counts")
+
+# Daily distribution of rentals (average)
+
+sns.barplot("hour", "cnt", data=hour_df_out.compute(), ci=None)
+
+# Weekday distribution of rentals (average)
+
+sns.set()
+sns.barplot("weekday", "cnt", data=hour_df_out.compute(), ci=None)
+
+# Hourly distribution of rentals per weekdays (average)
+
+# Configuring plotting visual and sizes
+sns.set_style("whitegrid")
+sns.set_context("talk")
+params = {
+    "legend.fontsize": "x-large",
+    "figure.figsize": (30, 10),
+    "axes.labelsize": "x-large",
+    "axes.titlesize": "x-large",
+    "xtick.labelsize": "x-large",
+    "ytick.labelsize": "x-large",
+}
+
+plt.rcParams.update(params)
+fig, ax = plt.subplots()
+sns.pointplot(
+    data=hour_df_out[["hour", "cnt", "weekday"]].compute(),
+    x="hour",
+    y="cnt",
+    hue="weekday",
+    ax=ax,
+)
+ax.set(title="Season wise hourly distribution of counts")
+
+# Average distribution whether it is holiday or not
+
+sns.set()
+sns.barplot("is_holiday", "cnt", data=hour_df_out.compute(), ci=None)
+
+# Average distribution whether workday or not
+
+sns.set()
+sns.barplot("is_workingday", "cnt", data=hour_df_out.compute(), ci=None)
+
+
