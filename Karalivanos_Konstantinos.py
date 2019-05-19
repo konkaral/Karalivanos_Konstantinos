@@ -256,4 +256,27 @@ sns.barplot("is_holiday", "cnt", data=hour_df_out.compute(), ci=None)
 sns.set()
 sns.barplot("is_workingday", "cnt", data=hour_df_out.compute(), ci=None)
 
+# To understand how the variables are correlated to the target variable visual representations are developed
 
+plt.figure(figsize=(20, 5))
+mask = np.zeros_like(hour_df_out.compute().corr(), dtype=np.bool)
+mask[np.triu_indices_from(mask)] = True
+sns.heatmap(hour_df.corr(), cmap="RdBu_r", mask=mask, annot=True)
+
+# Weather conditions
+
+sns.set()
+sns.lineplot("atemp", "cnt", data=hour_df.compute(), palette="rainbow", ci=None)
+
+# Windspeed
+
+sns.set()
+sns.lineplot("windspeed", "cnt", data=hour_df.compute(), palette="rainbow", ci=None)
+
+sns.set()
+sns.lineplot("windspeed", "cnt", data=hour_df_out.compute(), palette="rainbow", ci=None)
+
+# Weathersit
+
+sns.set()
+sns.lineplot("weathersit", "cnt", data=hour_df.compute(), palette="rainbow", ci=None)
