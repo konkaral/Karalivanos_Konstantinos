@@ -353,3 +353,129 @@ plt.figure(figsize=(20, 5))
 mask = np.zeros_like(hour_df_out.corr(), dtype=np.bool)
 mask[np.triu_indices_from(mask)] = True
 sns.heatmap(hour_df_out.corr(), cmap="RdBu_r", annot=True)
+
+# Feature Selection
+
+# temp
+
+# temp vs Target
+
+plt.scatter(hour_df_out[["temp"]].compute(), hour_df_out[["cnt"]].compute(), alpha=0.5)
+plt.title("temp Vs Target('cnt')")
+plt.xlabel("temp")
+plt.ylabel("Bike sharing count")
+plt.show()
+
+# atemp
+
+# atemp vs Target
+
+plt.scatter(hour_df_out[["atemp"]].compute(), hour_df_out[["cnt"]].compute(), alpha=0.5)
+plt.title("atemp Vs Target('cnt')")
+plt.xlabel("atemp")
+plt.ylabel("Bike sharing count")
+plt.show()
+
+# humidity 
+
+# temp vs Target
+
+plt.scatter(
+    hour_df_out[["humidity"]].compute(), hour_df_out[["cnt"]].compute(), alpha=0.5
+)
+plt.title("humidity Vs Target('cnt')")
+plt.xlabel("humidity")
+plt.ylabel("Bike sharing count")
+plt.show()
+
+# windspeed 
+
+# windspeed vs Target
+
+plt.scatter(
+    hour_df_out[["windspeed"]].compute(), hour_df_out[["cnt"]].compute(), alpha=0.5
+)
+plt.title("windspeed Vs Target('cnt')")
+plt.xlabel("windspeed")
+plt.ylabel("Bike sharing count")
+plt.show()
+
+# casual
+
+# casual vs Target
+
+plt.scatter(
+    hour_df_out[["casual"]].compute(), hour_df_out[["cnt"]].compute(), alpha=0.5
+)
+plt.title("casual Vs Target('cnt')")
+plt.xlabel("casual")
+plt.ylabel("Bike sharing count")
+plt.show()
+
+# registered 
+
+# registered vs Target
+
+plt.scatter(
+    hour_df_out[["registered"]].compute(), hour_df_out[["cnt"]].compute(), alpha=0.5
+)
+plt.title("registered Vs Target('cnt')")
+plt.xlabel("registered")
+plt.ylabel("Bike sharing count")
+plt.show()
+
+# temp_real
+
+# temp_real vs Target
+
+plt.scatter(
+    hour_df_out[["temp_real"]].compute(), hour_df_out[["cnt"]].compute(), alpha=0.5
+)
+plt.title("temp_real Vs Target('cnt')")
+plt.xlabel("temp_real")
+plt.ylabel("Bike sharing count")
+plt.show()
+
+# heat index
+
+# heat_index vs Target
+
+plt.scatter(
+    hour_df_out[["heat_index"]].compute(), hour_df_out[["cnt"]].compute(), alpha=0.5
+)
+plt.title("heat_index Vs Target('cnt')")
+plt.xlabel("heat_index")
+plt.ylabel("Bike sharing count")
+plt.show()
+
+# WCI 
+
+# WCI vs Target
+
+plt.scatter(hour_df_out[["WCI"]].compute(), hour_df_out[["cnt"]].compute(), alpha=0.5)
+plt.title("WCI Vs Target('cnt')")
+plt.xlabel("WCI")
+plt.ylabel("Bike sharing count")
+plt.show()
+
+# v
+
+# WCI vs Target
+
+plt.scatter(hour_df_out[["v"]].compute(), hour_df_out[["cnt"]].compute(), alpha=0.5)
+plt.title("v Vs Target('cnt')")
+plt.xlabel("v")
+plt.ylabel("Bike sharing count")
+plt.show()
+
+# humidex
+
+# WCI vs Target
+plt.scatter(
+    hour_df_out[["humidex"]].compute(), hour_df_out[["cnt"]].compute(), alpha=0.5
+)
+plt.title("humidex Vs Target('cnt')")
+plt.xlabel("humidex")
+plt.ylabel("Bike sharing count")
+plt.show()
+
