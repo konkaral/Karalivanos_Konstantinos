@@ -479,3 +479,107 @@ plt.xlabel("humidex")
 plt.ylabel("Bike sharing count")
 plt.show()
 
+# Modelling
+
+# import libraries
+
+from sklearn import linear_model
+import math
+from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import cross_val_predict
+from sklearn.model_selection import cross_val_score
+from sklearn.metrics import r2_score
+import datetime as dt
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import mean_absolute_error
+from sklearn.linear_model import Lasso
+from sklearn.linear_model import Ridge
+from dask_ml.linear_model import LinearRegression
+from dask_ml.metrics import r2_score
+
+# linear regression
+
+lr_model = LinearRegression()
+
+traintrial = hour_df[hour_df["datetime"].compute() < "2012-10-01"]
+testtrial = hour_df[hour_df["datetime"].compute() >= "2012-10-01"]
+
+# drop the target variable and "registered" variable since we are using registered along with the rest of features
+
+X_traintrial = traintrial.drop(
+    ["cnt", "registered", "month", "casual", "season"], axis=1
+)
+y_traintrial = traintrial["cnt"]
+X_testtrial = testtrial.drop(["cnt", "registered", "month", "casual"], axis=1)
+y_testtrial = testtrial["cnt"]
+X_traintrial = X_traintrial.drop(["datetime"], axis=1)
+X_testtrial = X_testtrial.drop(["datetime"], axis=1)
+
+# for DummyEncoder to work need to categorize the variables first
+
+X_traintrial = X_traintrial.categorize(
+    ["year", "hour", "is_holiday", "weekday", "is_workingday", "weathersit"]
+)
+
+X_testtrial = X_testtrial.categorize(
+    ["year", "hour", "is_holiday", "weekday", "is_workingday", "weathersit"]
+    
+de = DummyEncoder(
+    ["year", "hour", "is_holiday", "weekday", "is_workingday", "weathersit"]
+)
+X_traintrial = de.fit_transform(X_traintrial)
+
+
+de = DummyEncoder(
+    ["year", "hour", "is_holiday", "weekday", "is_workingday", "weathersit"]
+)
+X_testtrial = de.fit_transform(X_testtrial)
+)
+
+lr = LinearRegression()
+lr.fit(X_traintrial.values, y_traintrial.values)
+
+X_testtrial = X_testtrial.drop("season", axis=1)
+
+y_predtrial = lr.predict(X_traintrial.values)
+
+y_predtest = lr.predict(X_testtrial.values)
+
+import dask.array as da
+
+y_predtest.compute()
+
+# random forest 
+
+rf = RandomForestRegressor(n_estimators=1000, max_depth=10)
+
+rf.fit(X_traintrial, y_traintrial)
+
+rf_pred = rf.predict(X_testtrial)
+
+# in case a value is predicted as minus
+
+rf_pred = [i if i >= 0 else 0 for i in rf_pred]  
+
+# round prediction count to the nearest integer
+
+rf_pred = [round(x) for x in rf_pred]
+
+# root mean squared error
+
+print("RMSE: %.2f" % np.sqrt(mean_squared_error(y_testtrial, rf_pred)))
+
+# feature importance
+
+feature_importance = rf.feature_importances_
+feature_importance = 100.0 * (feature_importance / feature_importance.max())
+sorted_idx = np.argsort(feature_importance)
+pos = np.arange(sorted_idx.shape[0]) + 0.5
+plt.figure(figsize=(12, 10))
+plt.barh(pos, feature_importance[sorted_idx], align="center")
+plt.yticks(pos, X_traintrial.columns[sorted_idx])
+plt.xlabel("Relative Importance")
+plt.title("Variable Importance")
+plt.show()
